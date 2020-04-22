@@ -78,8 +78,7 @@ goto end
 set /p whetherUnzip= Do you want to unzip these files and execute?(y/n)
 if not "%whetherUnzip%"=="y" goto end
 for /F %%i in (%targetFileListPath%) do (
-	echo %%i|findstr "%DstDate%" >nul
-	if "!errorlevel!"=="0" call IntegrateZip.bat %sftpDataDir%%%i
+	call IntegrateZip.bat %sftpDataDir%%%i
 )
 goto end
 

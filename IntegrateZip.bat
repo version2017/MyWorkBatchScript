@@ -54,7 +54,8 @@ for /r %targetDir% %%i in (*) do (
 % Step 4£ºexecution confirmation  %
 :confirmExecute
 @set /p input= Are you sure to execute these scripts?(y/n)
-if "%input%"=="y" goto doExecute
+if not "%input%"=="y" goto end
+goto doExecute
 @goto end
 
 % Step 5£ºdo execute %

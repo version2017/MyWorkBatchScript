@@ -39,6 +39,7 @@ goto end
 :listFileToDownload
 echo ********Listing files to download.It may take few minutes.Please wait a moment...
 echo. > %targetFileListPath%
+echo cd %targetFtpPath% > %downloadCommandPath%
 goto listFileByDays
 goto end
 
@@ -55,6 +56,7 @@ for /F "tokens=9 delims= " %%i in (%fileListLogPath%) do (
 	if not "!ReplaceStrWithSpaceRet!"=="%%i" (
 		echo %%i
 		echo %%i >> %targetFileListPath%
+		echo get %%i >> %downloadCommandPath%
 	)
 	
 )
@@ -65,31 +67,7 @@ if %daysAgo% gtr 1 (
 goto confirmDownload
 goto end
 
-::deprecated
-:listFileToDownload2
->"%temp%\MyDate.vbs" echo LastDate=date()-%daysAgo%
->>"%temp%\MyDate.vbs" echo FmtDate=right(year(LastDate),4) ^& right("0" ^& month(LastDate),2) ^& right("0" ^& day(LastDate),2)
->>"%temp%\MyDate.vbs" echo wscript.echo FmtDate
-for /f %%a in ('cscript /nologo "%temp%\MyDate.vbs"') do (set DstDate=%%a)
-set DstDate=%DstDate:~0,4%%DstDate:~4,2%%DstDate:~6,2%
-if "%isDebug%"=="1" echo DstDate=%DstDate%
-
-echo ********Listing files to download.It may take few minutes.Please wait a moment...
-echo. > %targetFileListPath%
-for /F "tokens=9 delims= " %%i in (%fileListLogPath%) do (
-	echo %%i|findstr "%DstDate%" >nul
-	if "!errorlevel!"=="0" echo %%i
-	if "!errorlevel!"=="0" echo %%i >> %targetFileListPath%
-)
-goto confirmDownload
-goto end
-
 :confirmDownload
-echo cd %targetFtpPath% > %downloadCommandPath%
-for /F %%i in (%targetFileListPath%) do (
-	echo %%i|findstr "%DstDate%" >nul
-	if "!errorlevel!"=="0" echo get %%i >> %downloadCommandPath%
-)
 set /p whetherDownload= Do you want to download these files?(y/n)
 if not "%whetherDownload%"=="y" goto end
 call callPsftpScripts.bat "%downloadCommandPath%" > %fileDownloadLogPath%
